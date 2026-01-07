@@ -31,7 +31,7 @@ function convertToValidWindowsFilename($filename) {
 
 
 Route::get('/{id}', function (int $id) {
-
+    ob_clean(); // Buffer leeren
     Log::info("Anfrage für Zertifikat ID: {$id}");
 
     $zertifikat = Zeugnis::find($id);
@@ -61,16 +61,22 @@ Route::get('/{id}', function (int $id) {
 Log::info("Dateigröße: " . filesize($filePath));
 Log::info("Dateipfad absolut: " . realpath($filePath));
 
-// Test: Gib einfachen Text zurück
-return response('Test ' . $id, 200, [
-    'Content-Type' => 'text/plain'
-]);
 
     /*
     return response()->download($filePath, $filename, [
         'Content-Type' => 'application/pdf',
     ]);
     */
+
+    $response = response()->download($filePath, $name, [
+        'Content-Type' => 'application/pdf',
+    ]);
+
+    // Logge die Response Details
+    Log::info("Response Status: " . $response->getStatusCode());
+    Log::info("Response Headers: " . json_encode($response->headers->all()));
+
+    return $response;
 
 	header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
 	header("Cache-Control: public"); // needed for internet explorer
