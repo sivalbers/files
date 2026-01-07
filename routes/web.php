@@ -63,7 +63,15 @@ Route::get('/{id}', function (int $id) {
         'Cache-Control' => 'public', // needed for internet explorer
     ];
 
-    return response()->download($filePath, $name, $headers);
+//     return response()->download($filePath, $name, $headers)->setStatusCode(200);
+
+    $response = response()
+        ->download($filePath, $name, $headers)
+        ->setStatusCode(200);
+
+    Log::info("Response Status: " . $response->status());
+
+    return $response;
 
 
 	header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
