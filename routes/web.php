@@ -60,7 +60,7 @@ Route::get('/{id}', function ($id){
         header("Content-Length:".filesize($attachment_location));
         header("Content-Disposition: attachment; filename=".$name.".pdf");
         readfile($attachment_location);
-        return response()->status(200);
+        return response('OK',200);
     } else {
     //	dump($zertifikat);
         return view('notfound', ['id' => $id]);
