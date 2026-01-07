@@ -55,6 +55,16 @@ Route::get('/{id}', function (int $id) {
         $zertifikat->teilenr
     ) . '.pdf';
 
+    $headers = [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => "attachment; filename=".$name.".pdf",
+	    'Content-Transfer-Encoding' => 'Binary',
+	    'Content-Length' => filesize($attachment_location),
+        'Cache-Control' => 'public', // needed for internet explorer
+    ];
+
+    return response()->download($filePath, $name, $headers);
+
 
 	header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
 	header("Cache-Control: public"); // needed for internet explorer
