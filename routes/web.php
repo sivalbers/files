@@ -41,14 +41,15 @@ Route::get('/{id}', function (int $id) {
         return response()->view('notfound', ['id' => $id], 404);
     }
 
-    $filePath = rtrim(config('custom.files_route'), '/') . '/' . $zertifikat->filename;
+    $attachment_location = rtrim(config('custom.files_route'), '/') . '/' . $zertifikat->filename;
 
+    $filePath = $attachment_location;
     if (!is_file($filePath)) {
         Log::warning("Datei fehlt: {$filePath} (ID: {$id})");
         return response()->view('notfound', ['id' => $id], 404);
     }
 
-    $filename = verketten(
+    $name = verketten(
         $zertifikat->materialnummer,
         $zertifikat->ident,
         $zertifikat->teilenr
@@ -56,9 +57,20 @@ Route::get('/{id}', function (int $id) {
 
     Log::info("Download OK: {$filePath}");
 
+    /*
     return response()->download($filePath, $filename, [
         'Content-Type' => 'application/pdf',
     ]);
+    */
+
+	header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+	header("Cache-Control: public"); // needed for internet explorer
+	header("Content-Type: application/pdf");
+	header("Content-Transfer-Encoding: Binary");
+	header("Content-Length:".filesize($attachment_location));
+	header("Content-Disposition: attachment; filename=".$name.".pdf");
+	readfile($attachment_location);
+	die();
 
 })->whereNumber('id');
 
