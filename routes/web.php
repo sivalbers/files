@@ -30,56 +30,43 @@ function convertToValidWindowsFilename($filename) {
 */
 
 
-Route::get('/{id}', function ($id) {
-    try {
-        Log::info("Anfrage für Zertifikat ID: {$id}");
-        // Versuche das Zertifikat anhand der ID zu finden
-        $zertifikat = Zeugnis::where('id', $id)->firstOrFail();
+Route::get('/{id}', function (int $id) {
 
-        // Dateiname aus dem Datensatz lesen
-        $documentName = $zertifikat->filename;
+    Log::info("Anfrage für Zertifikat ID: {$id}");
 
-        // Benutzerfreundlicher Name
-        $name = verketten($zertifikat->materialnummer, $zertifikat->ident, $zertifikat->teilenr);
+    $zertifikat = Zeugnis::find($id);
 
-        // Pfad zur Datei
-        $attachment_location = rtrim(config('custom.files_route'), '/') . '/' . $documentName;
-
-        // Prüfe, ob Datei existiert
-        if (!empty($documentName) && file_exists($attachment_location)) {
-
-            /*
-            // Sende PDF an Browser
-            header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
-            header("Cache-Control: public");
-            header("Content-Type: application/pdf");
-            header("Content-Transfer-Encoding: Binary");
-            header("Content-Length: " . filesize($attachment_location));
-            header("Content-Disposition: attachment; filename=\"{$name}.pdf\"");
-            readfile($attachment_location);
-
-            die();
-            */
-            Log::warning("Datei gefunden: {$attachment_location} (ID: {$id})");
-            return response()->file($attachment_location, [
-                'Content-Disposition' => 'attachment; filename="' . $name . '.pdf"',
-                ]);
-
-        } else {
-            // Datei nicht gefunden – logge und gib View aus
-            Log::warning("Datei nicht gefunden: {$attachment_location} (ID: {$id})");
-            return view('notfound', ['id' => $id]);
-        }
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        // Kein Datensatz mit dieser ID
-        Log::error("Zertifikat mit ID {$id} nicht gefunden.");
-        return view('notfound', ['id' => $id]);
-    } catch (\Throwable $e) {
-        // Allgemeiner Fehler (z. B. Pfadproblem, Berechtigung, etc.)
-        Log::error("Fehler beim Abrufen von Zertifikat ID {$id}: " . $e->getMessage());
-        return view('notfound', ['id' => $id]);
+    if (!$zertifikat) {
+        Log::warning("Kein Zertifikat gefunden (ID: {$id})");
+        return response()->view('notfound', ['id' => $id], 404);
     }
+
+    $filePath = rtrim(config('custom.files_route'), '/') . '/' . $zertifikat->filename;
+
+    if (!is_file($filePath)) {
+        Log::warning("Datei fehlt: {$filePath} (ID: {$id})");
+        return response()->view('notfound', ['id' => $id], 404);
+    }
+
+    $filename = verketten(
+        $zertifikat->materialnummer,
+        $zertifikat->ident,
+        $zertifikat->teilenr
+    ) . '.pdf';
+
+    Log::info("Download OK: {$filePath}");
+
+    return response()->download($filePath, $filename, [
+        'Content-Type' => 'application/pdf',
+    ]);
+
+})->whereNumber('id');
+
+Route::get('/favicon.ico', function () {
+    abort(404); // oder return response()->noContent();
 });
+
+
 /*
 Route::get('/{id}', function ($id){
 	//return "Function ist : ".$id;
