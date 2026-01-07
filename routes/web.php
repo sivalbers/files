@@ -57,7 +57,7 @@ Route::get('/test/{id}', function ($id) {
             header("Content-Length: " . filesize($attachment_location));
             header("Content-Disposition: attachment; filename=\"{$name}.pdf\"");
             readfile($attachment_location);
-            exit;
+            die();
         } else {
             // Datei nicht gefunden – logge und gib View aus
             Log::warning("Datei nicht gefunden: {$attachment_location} (ID: {$id})");
