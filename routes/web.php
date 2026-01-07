@@ -57,6 +57,15 @@ Route::get('/{id}', function (int $id) {
 
     Log::info("Download OK: {$filePath}");
 
+// Füge Debugging hinzu:
+Log::info("Dateigröße: " . filesize($filePath));
+Log::info("Dateipfad absolut: " . realpath($filePath));
+
+// Test: Gib einfachen Text zurück
+return response('Test ' . $id, 200, [
+    'Content-Type' => 'text/plain'
+]);
+
     /*
     return response()->download($filePath, $filename, [
         'Content-Type' => 'application/pdf',
