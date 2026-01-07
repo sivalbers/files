@@ -47,6 +47,8 @@ Route::get('/{id}', function ($id) {
 
         // Prüfe, ob Datei existiert
         if (!empty($documentName) && file_exists($attachment_location)) {
+
+            /*
             // Sende PDF an Browser
             header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
             header("Cache-Control: public");
@@ -55,8 +57,14 @@ Route::get('/{id}', function ($id) {
             header("Content-Length: " . filesize($attachment_location));
             header("Content-Disposition: attachment; filename=\"{$name}.pdf\"");
             readfile($attachment_location);
-            Log::warning("Datei gefunden: {$attachment_location} (ID: {$id})");
+
             die();
+            */
+            Log::warning("Datei gefunden: {$attachment_location} (ID: {$id})");
+            return response()->file($attachment_location, [
+                'Content-Disposition' => 'attachment; filename="' . $name . '.pdf"',
+                ]);
+
         } else {
             // Datei nicht gefunden – logge und gib View aus
             Log::warning("Datei nicht gefunden: {$attachment_location} (ID: {$id})");
