@@ -69,7 +69,7 @@ Route::get('/{id}', function (int $id) {
         ->download($filePath, $name, $headers)
         ->setStatusCode(200);
 
-    Log::info("Response Status: " . $response->status());
+    Log::info("Response Status: " . $response->getStatusCode());
 
     return $response;
 
