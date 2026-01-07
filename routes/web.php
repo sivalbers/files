@@ -55,28 +55,6 @@ Route::get('/{id}', function (int $id) {
         $zertifikat->teilenr
     ) . '.pdf';
 
-    Log::info("Download OK: {$filePath}");
-
-// Füge Debugging hinzu:
-Log::info("Dateigröße: " . filesize($filePath));
-Log::info("Dateipfad absolut: " . realpath($filePath));
-
-
-    /*
-    return response()->download($filePath, $filename, [
-        'Content-Type' => 'application/pdf',
-    ]);
-    */
-
-    $response = response()->download($filePath, $name, [
-        'Content-Type' => 'application/pdf',
-    ]);
-
-    // Logge die Response Details
-    Log::info("Response Status: " . $response->getStatusCode());
-    Log::info("Response Headers: " . json_encode($response->headers->all()));
-
-    return $response;
 
 	header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
 	header("Cache-Control: public"); // needed for internet explorer
