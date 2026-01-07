@@ -30,6 +30,10 @@ function convertToValidWindowsFilename($filename) {
 */
 
 Route::get('/{id}', function ($id) {
+    return response("ID ist: $id", 200);
+});
+
+Route::get('/test/{id}', function ($id) {
     try {
         // Versuche das Zertifikat anhand der ID zu finden
         $zertifikat = Zeugnis::where('id', $id)->firstOrFail();
