@@ -14,7 +14,7 @@ use App\Models\Zeugnis;
 |
 */
 
-if (!function_exists('verketten')) {
+
     function verketten($m1, $m2, $m3) {
         $string = "";
 
@@ -32,7 +32,7 @@ if (!function_exists('verketten')) {
 
         return $string;
     }
-}
+
 
 
 
